@@ -41,6 +41,9 @@ async function ready() {
     await page.locator('.nav-doc[data-path*="第01课"]').click();
     await page.waitForFunction(() => document.querySelector("#article h1")?.textContent.includes("第 01 课"), null, {timeout:30000});
     await page.waitForSelector("#article img", {timeout:10000});
+    await page.waitForTimeout(1200);
+    const imageChecks=await page.locator("#article img").evaluateAll(imgs=>imgs.map(i=>({source:i.getAttribute("src"),resolved:i.src,complete:i.complete,width:i.naturalWidth})));
+    console.log("Image diagnostics:",JSON.stringify(imageChecks));
     await page.waitForFunction(() => [...document.querySelectorAll("#article img")].every(i=>i.complete&&i.naturalWidth>0), null, {timeout:15000});
     console.log("PASS: original SVG diagrams loaded");
 
