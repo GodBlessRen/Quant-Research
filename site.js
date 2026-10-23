@@ -11,7 +11,8 @@ const EXTRAS = [
   {path:"research/回测与时间验证.md",title:"回测、标签与时间序列验证",kind:"research",group:"研究者校勘"},
   {path:"research/IC与信息比率.md",title:"IC、IR 与可实现收益",kind:"research",group:"研究者校勘"},
   {path:"research/风控与订单状态机.md",title:"风控熔断与订单一致性",kind:"research",group:"研究者校勘"},
-  {path:"research/状态与拥挤.md",title:"市场状态、拥挤与压力",kind:"research",group:"研究者校勘"}
+  {path:"research/状态与拥挤.md",title:"市场状态、拥挤与压力",kind:"research",group:"研究者校勘"},
+  {path:"research/宏观状态与债务周期.md",title:"宏观状态与债务周期：中美研究",kind:"research",group:"研究者校勘"}
 ];
 const NOTES = [
  {test:/第0?7课/,label:"标签与前瞻偏差",text:"未来收益可合法用作监督学习的训练标签；错误的是让标签在尚未实现时进入决策特征、训练信息集或模型选择。重叠标签需要与实际持有期一致的样本隔离。",link:"research/回测与时间验证.md"},
