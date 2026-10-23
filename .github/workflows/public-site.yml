@@ -1,0 +1,42 @@
+name: Check public Quant Research site
+
+on:
+  push:
+    paths:
+      - .github/workflows/public-site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Verify public GitHub Pages home and 71-document manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=https://godblessren.github.io/Quant-Research
+          for attempt in $(seq 1 18); do
+            if curl -fsSL --connect-timeout 6 --max-time 16 "$BASE/" -o /tmp/quant-home.html \
+               && grep -q 'site.js' /tmp/quant-home.html \
+               && curl -fsSL --connect-timeout 6 --max-time 16 "$BASE/book/manifest.json" -o /tmp/quant-manifest.json \
+               && curl -fsSL --connect-timeout 6 --max-time 16 "$BASE/vendor/markdown-it.min.js" -o /tmp/quant-renderer.js; then
+              python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('/tmp/quant-manifest.json').read_text())
+          assert m['count']==71,m['count']
+          assert sum(x['kind']=='lesson' for x in m['pages'])==22
+          assert len(Path('/tmp/quant-renderer.js').read_bytes())>40000
+          print('PUBLIC SITE HEALTHY: 200 OK / full 71-document manifest / local Markdown engine')
+          PY
+              exit 0
+            fi
+            echo "Site not propagated yet (attempt $attempt/18)"
+            sleep 5
+          done
+          echo "::error::Public GitHub Pages site is not serving expected files"
+          exit 1
