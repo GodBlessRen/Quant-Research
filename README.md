@@ -46,10 +46,9 @@
 3. `Build and deployment → Source → Deploy from a branch`；选择 `main` 和 `/(root)`，点击 Save。
 4. 待 GitHub Pages 构建完成，打开 https://godblessren.github.io/Quant-Research/ 。
 
-## 本地检查
+## 本地预览
 
 ```bash
-node --test tests/*.test.mjs
 python3 -m http.server 8000
 ```
 
