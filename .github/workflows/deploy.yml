@@ -21,37 +21,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-      - name: Validate homepage and JavaScript
+      - name: Verify complete textbook and reader scripts
         shell: bash
         run: |
+          set -euo pipefail
           test -s index.html
-          test -f .nojekyll
+          test -s site.js
+          test -s site.css
+          test -f book/manifest.json
+          test "$(find book/cn -type f -name '*.md' | wc -l)" -eq 71
+          test "$(find book/cn -type f -name '*.svg' | wc -l)" -eq 69
+          node --check site.js
           python3 - <<'PY'
-          from html.parser import HTMLParser
           from pathlib import Path
-          class Scripts(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.inside = False
-                  self.scripts = []
-              def handle_starttag(self, tag, attrs):
-                  if tag == "script" and not dict(attrs).get("src"):
-                      self.inside = True
-              def handle_endtag(self, tag):
-                  if tag == "script":
-                      self.inside = False
-              def handle_data(self, data):
-                  if self.inside:
-                      self.scripts.append(data)
-          parser = Scripts()
-          homepage = Path("index.html").read_text(encoding="utf-8")
-          assert '<html lang="zh-CN">' in homepage
-          parser.feed(homepage)
-          assert parser.scripts, "Expected inline JavaScript"
-          Path("/tmp/quant-research-main.js").write_text("\n".join(parser.scripts), encoding="utf-8")
-          print("Homepage and JavaScript extracted")
+          import json
+          manifest=json.loads(Path('book/manifest.json').read_text(encoding='utf8'))
+          assert manifest['count'] == 71
+          for page in manifest['pages']:
+              assert Path(page['path']).is_file(), page['path']
+          html=Path('index.html').read_text(encoding='utf8')
+          assert '<html lang="zh-CN">' in html
+          assert 'site.js' in html and 'site.css' in html
+          print('Validated: 71 full chapters, 69 SVG diagrams, complete reader.')
           PY
-          node --check /tmp/quant-research-main.js
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
