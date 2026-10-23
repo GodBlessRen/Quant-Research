@@ -41,7 +41,8 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           cd "$GITHUB_WORKSPACE"
           mkdir -p book
-          cp -a "$RUNNER_TEMP/quant-source/manuscript/cn" book/cn
+          mkdir -p book/cn
+          rsync -a --delete "$RUNNER_TEMP/quant-source/manuscript/cn/" book/cn/
           test "$(find book/cn -type f -name '*.md' | wc -l)" -eq 71
           test "$(find book/cn -type f -name '*.svg' | wc -l)" -eq 69
           test "$(git hash-object 'book/cn/Part2-量化基础/第07课：回测系统的陷阱.md')" = 3ba6fbbb9bb4ea42958b44125d70fe605cc4e40e
