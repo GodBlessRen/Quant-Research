@@ -73,7 +73,7 @@ async function fetchText(path){const resp=await fetch(docUrl(path),{cache:"defau
 function remoteScript(src,timeout=9000){return new Promise((resolve,reject)=>{const el=document.createElement("script");el.src=src;el.async=true;const wait=setTimeout(()=>{el.remove();reject(Error("加载超时"))},timeout);el.onload=()=>{clearTimeout(wait);resolve()};el.onerror=()=>{clearTimeout(wait);el.remove();reject(Error("第三方脚本暂不可用"))};document.head.append(el)})}
 async function getRenderer(){
  if(params.parser)return params.parser;
- for(const src of ["https://cdn.jsdelivr.net/npm/markdown-it@14.2.0/dist/markdown-it.min.js","https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.2/markdown-it.min.js"]){
+ for(const src of ["./vendor/markdown-it.min.js","https://cdn.jsdelivr.net/npm/markdown-it@14.2.0/dist/markdown-it.min.js","https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.2/markdown-it.min.js"]){
   try{await remoteScript(src);if(typeof window.markdownit==="function"){params.parser=window.markdownit({html:true,linkify:true,typographer:true,breaks:false});return params.parser}}catch{}
  }
  return null;
