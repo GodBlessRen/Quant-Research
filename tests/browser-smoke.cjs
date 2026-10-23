@@ -18,7 +18,7 @@ async function ready() {
   let browser;
   try {
     await ready();
-    browser = await chromium.launch({headless:true});
+    browser = await chromium.launch({channel:"chrome",headless:true});
     const page = await browser.newPage({viewport:{width:1440,height:900},deviceScaleFactor:1});
     const errors = [];
     page.on("pageerror", e => errors.push(e.message));
