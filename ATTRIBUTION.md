@@ -1,14 +1,39 @@
-# 资料来源、原创性与使用边界
+# 原作者、来源与许可证（完整教材收录）
 
-本项目面向独立量化研究。部分主题与工程理念受到以下公开教育资源启发：
+## 1. 原书的明确署名
 
-- Wayland Zhang, [《AI量化交易：从0到1》](https://waylandz.com/quant-book/)，[代码与书稿仓库](https://github.com/waylandzhang/ai-quant-book)，原书声明 CC BY-NC-SA 4.0。
-- Richard Grinold / Ronald Kahn, *Active Portfolio Management*，关于 IC、Breadth 与信息比率的近似关系。
-- Bailey / López de Prado 关于回测过拟合、Deflated Sharpe Ratio、Probabilistic Sharpe Ratio 的研究。
-- 时间序列机器学习中的样本隔离、purged cross-validation 和 embargo 技术。
+本仓库 `book/cn/` 目录包含 Wayland Zhang 创作的 **《AI量化交易从0到1》中文原版教材**：22课正文、30篇背景知识、4篇附录、9篇资料、6篇导读与69张SVG图示。
 
-本网站**不复制原书全文、原图、原代码**。章节、结构、术语定义、示例、交互工具及网页视觉由本项目重新编写与组织。原书启发的交易系统工程主题（数据、回测、执行与风控）属于领域通用思想；具体原创表达在本项目单独实现。
+- 原作者：**Wayland Zhang**
+- 原著网站：https://waylandz.com/quant-book/
+- 源码/原稿：https://github.com/waylandzhang/ai-quant-book
+- 固定来源版本：`0f1cf8b68fa4a06b49efc0355d7b86b920e32c93`
+- 原书声明许可证：**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)**
+- 许可证条款：https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-本项目中文学习文本采用 CC BY-NC-SA 4.0。若未来引入外部图文、数据或代码，需逐项保留其许可证、署名、链接和修改说明。**不要把第三方来源的许可自动解释为无条件的商业再利用权。**
+## 2. 本项目做了哪些修改？
 
-教学情景中的公式只在其所列假设下成立，不保证未来表现。静态网页不提供行情服务、证券投资建议或下单接口。
+1. 原书71篇中文Markdown文件与69张SVG作为独立目录收录；**原文内容没有擅自混入本站批注**。
+2. 将原稿重新包装为响应式网页阅读器，生成章节清单与全文索引，支持搜索、导航、章节大纲、公式渲染。
+3. 编写 `research/` 下的**独立原创**研究文章，用明确的统计、数据时点与执行不变量补充教材内容；所有提示均标记为“研究者校勘”，不是原作者观点。
+4. `lab/` 为本站独立编写的教学实验，参数演算不构成市场预测。
+
+如果读者需要无修改上下文的原文，可打开 `book/cn/` 或直接访问原作者网站；本项目不以原作者的名义提供新增研究结论。
+
+## 3. 许可证边界
+
+- **原书内容、其中的图示及其许可约束下的改编和汇编**：继续遵循 CC BY-NC-SA 4.0。必须保留作者署名及原始出处，只允许符合非商业、相同方式共享要求的再利用。
+- **本站独立撰写的中文研究内容**：同样使用 CC BY-NC-SA 4.0，避免与原书内容混合时出现许可证冲突。
+- **本站独立实现的网站代码（HTML、CSS、JavaScript、GitHub Actions）**：MIT License，见 `LICENSE-CODE`。MIT 不授予对原书正文、图示或其他第三方资料的额外权利。
+
+重新发布时，不得删除作者署名、许可证文本、来源链接、修改声明，也不能把原作者的内容宣称为本站原创。
+
+本项目无原作者官方授权身份或背书声明；开源许可证许可的使用与“官方合作”是不同概念。
+
+## 4. 学术与工程方法参考
+
+本站独立研究文章另参考一般学术研究中广泛采用的方法：Grinold & Kahn 的主动管理基本定律、Bailey 与 López de Prado 关于回测过拟合与 DSR 的研究，以及 Purged CV、成交成本分析、时点一致性和运行状态机的公开工程方法。各研究文章给出更具体的说明。
+
+## 5. 风险说明
+
+全部内容仅供研究和教育，不构成投资建议、交易信号或收益承诺；原书中展示的案例与样例数字不代表经过本站独立实盘验证。
