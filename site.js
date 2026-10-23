@@ -236,6 +236,7 @@ function setupEvents(){
   if(["ArrowDown","ArrowUp"].includes(e.key)){e.preventDefault();if(!hits.length)return;params.selected=(params.selected+(e.key==="ArrowDown"?1:-1)+hits.length)%hits.length;hits.forEach((h,i)=>h.classList.toggle("selected",i===params.selected));hits[params.selected].scrollIntoView({block:"nearest"})}
   if(e.key==="Enter"&&hits.length){e.preventDefault();hits[params.selected]?.click()}
  });
+ document.addEventListener("keydown",e=>{if(e.key==="Escape" && $("search-dialog").open){e.preventDefault();e.stopPropagation();closeSearch()}},true);
  document.addEventListener("keydown",e=>{
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openSearch()}
   if(e.key==="/"&&!e.metaKey&&!e.ctrlKey&&!["INPUT","TEXTAREA"].includes(document.activeElement.tagName)&&!$("search-dialog").open){e.preventDefault();openSearch()}
