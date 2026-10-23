@@ -68,7 +68,7 @@ python3 -m http.server 8000
 # 打开 http://localhost:8000
 ```
 
-因完整教材使用浏览器端 Markdown 排版与 MathJax，首次访问可能需要从公共 CDN 加载排版工具；CDN 不可用时网页仍会回退为原始 Markdown 文本显示。
+Markdown 排版引擎已固定版本并放入本仓库 `vendor/markdown-it.min.js`，正常阅读不依赖外部 Markdown CDN；数学排版 MathJax 仍为可选的在线增强。即使排版组件加载失败，网页也会回退为原始 Markdown 文本，保留全部内容。\n\n每次发布验证 `node --check site.js`、71 份原文与 69 张图片；仓库还提供 [浏览器回归测试](./tests/browser-smoke.cjs)（Chrome / Playwright）和 [公网网站健康检查](./.github/workflows/public-site.yml)。
 
 ## 使用边界
 
