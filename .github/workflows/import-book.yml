@@ -45,6 +45,19 @@ jobs:
           test "$(find book/cn -type f -name '*.md' | wc -l)" -eq 71
           test "$(find book/cn -type f -name '*.svg' | wc -l)" -eq 69
           test "$(git hash-object 'book/cn/Part2-量化基础/第07课：回测系统的陷阱.md')" = 3ba6fbbb9bb4ea42958b44125d70fe605cc4e40e
+      - name: Vendor Markdown renderer for offline-first reading
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p vendor
+          curl -fL --retry 3 --connect-timeout 15 \
+            https://cdn.jsdelivr.net/npm/markdown-it@14.2.0/dist/markdown-it.min.js \
+            -o vendor/markdown-it.min.js
+          curl -fL --retry 3 --connect-timeout 15 \
+            https://raw.githubusercontent.com/markdown-it/markdown-it/master/LICENSE \
+            -o vendor/LICENSE-markdown-it
+          test "$(wc -c < vendor/markdown-it.min.js)" -gt 40000
+          grep -qi 'MIT' vendor/LICENSE-markdown-it
       - name: Generate complete book navigation and full-text index
         shell: bash
         run: |
@@ -87,7 +100,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add book/cn book/manifest.json book/search-index.json
+          git add book/cn book/manifest.json book/search-index.json vendor/
           if ! git diff --cached --quiet; then
             git commit -m "Import full CC BY-NC-SA textbook (71 docs, 69 diagrams)"
             git push origin HEAD:main
