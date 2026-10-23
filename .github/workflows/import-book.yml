@@ -1,0 +1,103 @@
+name: Import complete licensed textbook
+
+on:
+  push:
+    paths:
+      - .github/workflows/import-book.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: quant-book-import
+  cancel-in-progress: false
+
+jobs:
+  import-and-publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout Quant Research
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Retrieve pinned original textbook
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA=0f1cf8b68fa4a06b49efc0355d7b86b920e32c93
+          git clone --quiet --depth 1 https://github.com/waylandzhang/ai-quant-book.git "$RUNNER_TEMP/quant-source"
+          cd "$RUNNER_TEMP/quant-source"
+          ACTUAL_SHA=$(git rev-parse HEAD)
+          if [[ "$ACTUAL_SHA" != "$SOURCE_SHA" ]]; then
+            git fetch --quiet --depth 1 origin "$SOURCE_SHA"
+            git checkout --quiet --detach FETCH_HEAD
+          fi
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p book
+          cp -a "$RUNNER_TEMP/quant-source/manuscript/cn" book/cn
+          test "$(find book/cn -type f -name '*.md' | wc -l)" -eq 71
+          test "$(find book/cn -type f -name '*.svg' | wc -l)" -eq 69
+          test "$(git hash-object 'book/cn/Part2-量化基础/第07课：回测系统的陷阱.md')" = 3ba6fbbb9bb4ea42958b44125d70fe605cc4e40e
+      - name: Generate complete book navigation and full-text index
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          root = Path('book/cn')
+          entries, search = [], []
+          for file in root.rglob('*.md'):
+              rel = file.relative_to(Path('.')).as_posix()
+              segments = file.relative_to(root).parts
+              group = segments[0] if len(segments)>1 else '首页'
+              raw = file.read_text(encoding='utf-8')
+              h = re.search(r'^#\s+(.+)$', raw, re.M)
+              title = (h.group(1).strip() if h else file.stem).replace('**','')
+              if re.search(r'第\s*\d+\s*课',file.stem): kind='lesson'
+              elif '背景知识' in segments: kind='background'
+              elif '附录' in segments: kind='appendix'
+              elif group.startswith('Resources'): kind='resource'
+              elif file.name=='README.md': kind='overview'
+              else: kind='other'
+              num = re.search(r'第\s*(\d+)\s*课', file.name)
+              sort_num = int(num.group(1)) if num else 1000
+              entries.append({'path':rel,'title':title,'group':group,'kind':kind,'order':sort_num,'length':len(raw)})
+              plain = re.sub(r'\x60{3}[\s\S]*?\x60{3}',' ',raw)
+              plain = re.sub(r'[#>*\[\]()!_~\x60|]+',' ',plain)
+              search.append({'path':rel,'title':title,'text':plain[:25000]})
+          order={'overview':0,'lesson':1,'background':2,'appendix':3,'resource':4,'other':5}
+          groups={'首页':0,'Part1-快速体验':1,'Part2-量化基础':2,'Part3-机器学习':3,'Part4-多智能体':4,'Part5-生产与实战':5,'Resources & Links':6}
+          entries.sort(key=lambda e:(groups.get(e['group'],9),order.get(e['kind'],9),e['order'],e['title']))
+          Path('book/manifest.json').write_text(json.dumps({'count':len(entries),'author':'Wayland Zhang','license':'CC BY-NC-SA 4.0','source_revision':'0f1cf8b68fa4a06b49efc0355d7b86b920e32c93','pages':entries},ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          Path('book/search-index.json').write_text(json.dumps(search,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          assert len(entries)==71, len(entries)
+          assert sum(e['kind']=='lesson' for e in entries)==22
+          print('Imported',len(entries),'markdown pages and 69 original SVG diagrams')
+          PY
+      - name: Commit textbook to this repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add book/cn book/manifest.json book/search-index.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Import full CC BY-NC-SA textbook (71 docs, 69 diagrams)"
+            git push origin HEAD:main
+          fi
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload static website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+      - name: Deploy GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
